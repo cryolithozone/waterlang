@@ -70,6 +70,10 @@ class Token:
     loc: Location
     value: Any
 
+@dataclass
+class LexResult:
+    success: bool
+    tokens: List[Token]
 
 class Lexer:
     file_name: str
@@ -95,8 +99,15 @@ class Lexer:
         
     def cur_loc(self) -> Location:
         return Location(self.file_name, self.line, self.col)
+    
+    def report(self) -> LexResult:
+        err_tokens = list(filter(lambda t: t.ttype is TType.ERROR, self.tokens))
+        if len(err_tokens) == 0:
+            return LexResult(True, self.tokens)
+        else:
+            return LexResult(False, err_tokens)
 
-    def lex(self) -> List[Token]:
+    def lex(self) -> None:
         while True:
             c = self.get(self.cur)
             match c:
@@ -171,7 +182,6 @@ class Lexer:
                     self.col += 1
         eof = Token(TType.EOF, self.cur_loc(), None)
         self.tokens.append(eof)
-        return self.tokens
     
     def parse_ident(self, buf: str) -> None:
         ttype = None
