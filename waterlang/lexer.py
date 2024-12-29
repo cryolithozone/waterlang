@@ -118,6 +118,35 @@ class Lexer:
                     self.parse_numlit(buf)
                     self.cur += len(buf)
                     self.col += len(buf)
+                case "-":
+                    next_c = self.get(self.cur + 1)
+                    if next_c is not None and next_c == ">":
+                        tok = Token(TType.ARROW, self.cur_loc(), None)
+                        self.tokens.append(tok)
+                        self.cur += 2
+                        self.col += 2
+                    else:
+                        tok = Token(TType.OP, self.cur_loc(), Op.MINUS)
+                        self.tokens.append(tok)
+                        self.cur += 1
+                        self.col += 1
+                case "/":
+                    next_c = self.get(self.cur + 1)
+                    if next_c is not None and next_c == "/":
+                        while c != "\n":
+                            self.cur += 1
+                            self.col += 1
+                            c = self.get(self.cur)
+                    else:
+                        tok = Token(TType.OP, self.cur_loc(), Op.SLASH)
+                        self.tokens.append(tok)
+                        self.cur += 1
+                        self.col += 1
+                case "+" | "*":
+                    tok = Token(TType.OP, self.cur_loc(), Op.from_str(c))
+                    self.tokens.append(tok)
+                    self.cur += 1
+                    self.col += 1
         return self.tokens
     
     def parse_ident(self, buf: str) -> None:
