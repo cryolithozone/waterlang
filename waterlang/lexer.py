@@ -9,12 +9,19 @@ class TType(Enum):
     ARROW = auto()
     NUM = auto()
     OP = auto()
+    EOF = auto()
 
 class Kw(Enum):
     FUNC = auto()
     IS = auto()
     BEGIN = auto()
     END = auto()
+class Op(Enum):
+    PLUS = auto()
+    MINUS = auto()
+    STAR = auto()
+    SLASH = auto()
+
 
 @dataclass
 class Location:
