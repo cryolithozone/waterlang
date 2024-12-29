@@ -1,0 +1,16 @@
+program = { func_decl }*
+func_decl = "func" IDENT "(" arg_list ")" "->" TYPE "is" func_body
+func_body = block "func" | stmt ";"
+arg_list = { }
+block = "begin" { stmt ";" }* "end" | stmt ";"
+stmt = return_stmt 
+return_stmt = "return" expr
+expr = term { [ ("+"|"-") expr ] }*
+term = factor { [ ("*"|"/") term ] }*
+factor = ["-"] primary
+primary = NUMLIT | "(" expr ")"
+
+TYPE = "int" | "none"
+NUMLIT = ["-"] NON_ZERO_DIGIT { DIGIT }*
+DIGIT = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
+DIGIT = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9
