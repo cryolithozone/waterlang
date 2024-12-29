@@ -18,11 +18,35 @@ class Kw(Enum):
     BEGIN = auto()
     END = auto()
 
+    @staticmethod
+    def from_str(s: str):
+        match s:
+            case "func":
+                return Kw.FUNC
+            case "is":
+                return Kw.IS
+            case "begin":
+                return Kw.BEGIN
+            case "end":
+                return Kw.END
+
 class Op(Enum):
     PLUS = auto()
     MINUS = auto()
     STAR = auto()
     SLASH = auto()
+
+    @staticmethod
+    def from_str(s: str):
+        match s:
+            case "+":
+                return Op.PLUS
+            case "-":
+                return Op.MINUS
+            case "*":
+                return Op.STAR
+            case "/":
+                return Op.SLASH
 
 @dataclass
 class Location:
