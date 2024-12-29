@@ -54,8 +54,7 @@ class Expr:
             if isinstance(value, Expr):
                 res.append(f"\n{value.to_str(ident + 1)}")
             else:
-                res.append(f"{value}")
-            res.append("\n")
+                res.append(f"{value}\n")
         return "".join(res)
 
 
