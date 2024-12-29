@@ -29,6 +29,8 @@ class Kw(Enum):
                 return Kw.BEGIN
             case "end":
                 return Kw.END
+            case _:
+                raise ValueError(f"Unknown keyword {s}")
 
 class Op(Enum):
     PLUS = auto()
@@ -47,6 +49,8 @@ class Op(Enum):
                 return Op.STAR
             case "/":
                 return Op.SLASH
+            case _:
+                raise ValueError(f"Unknown operation {s}")
 
 @dataclass
 class Location:
