@@ -1,6 +1,11 @@
 import waterlang
 import sys
 
+def print_ast(ast: list[waterlang.parser.FuncDecl]) -> None:
+    for fdecl in ast:
+        print("-------")
+        print(fdecl)
+
 def main() -> None:
     args = sys.argv
     if len(args) < 2:
@@ -16,7 +21,11 @@ def main() -> None:
                 print("ERROR:", tok.loc, tok.value)
         else:
             for tok in result.tokens:
-                print(tok)
+                print("OK:", tok)
+        parser = waterlang.parser.Parser(result.tokens)
+        parser.parse()
+        print_ast(parser.ast)
+
 
 if __name__ == "__main__":
     main()
