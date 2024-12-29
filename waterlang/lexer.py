@@ -11,6 +11,7 @@ class TType(Enum):
     ARROW = auto()
     NUM = auto()
     OP = auto()
+    SEMI = auto()
     EOF = auto()
     ERROR = auto()
 
@@ -147,6 +148,23 @@ class Lexer:
                     self.tokens.append(tok)
                     self.cur += 1
                     self.col += 1
+                case "(":
+                    tok = Token(TType.L_PAREN, self.cur_loc(), None)
+                    self.tokens.append(tok)
+                    self.cur += 1
+                    self.col += 1
+                case ")":
+                    tok = Token(TType.R_PAREN, self.cur_loc(), None)
+                    self.tokens.append(tok)
+                    self.cur += 1
+                    self.col += 1
+                case ";":
+                    tok = Token(TType.SEMI, self.cur_loc(), None)
+                    self.tokens.append(tok)
+                    self.cur += 1
+                    self.col += 1
+        eof = Token(TType.EOF, self.cur_loc(), None)
+        self.tokens.append(eof)
         return self.tokens
     
     def parse_ident(self, buf: str) -> None:
