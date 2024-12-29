@@ -26,6 +26,7 @@ class Expr:
                 self.expr: Expr = information["expr"]
             case ExprType.Literal:
                 self.value: Any = information["value"]
+                self.type: ValueType = information["type"]
             case ExprType.Grouping:
                 self.expr = information["expr"]
             case _:
