@@ -19,6 +19,7 @@ class Kw(Enum):
     IS = auto()
     BEGIN = auto()
     END = auto()
+    RETURN = auto()
 
     @staticmethod
     def from_str(s: str):
@@ -31,6 +32,8 @@ class Kw(Enum):
                 return Kw.BEGIN
             case "end":
                 return Kw.END
+            case "return":
+                return Kw.RETURN
             case _:
                 raise ValueError(f"Unknown keyword {s}")
 
@@ -121,7 +124,7 @@ class Lexer:
         ttype = None
         value: None | Kw | str = None
         match buf:
-            case buf if buf == "func" or buf == "is" or buf == "begin" or buf == "end":
+            case buf if buf == "func" or buf == "is" or buf == "begin" or buf == "end" or buf == "return":
                 ttype = TType.KW
                 value = Kw.from_str(buf)
             case _:
