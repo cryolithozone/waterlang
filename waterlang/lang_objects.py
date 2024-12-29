@@ -41,6 +41,9 @@ class Expr:
                 self.expr = information["expr"]
             case _:
                 raise NotImplemented(f"not implemented expr type: {tag}")
+            
+    def __str__(self):
+        return f"{self.__dict__}"
 
 class Stmt:
     def __init__(self, tag: StmtType, information: dict[str, Any]):
@@ -52,6 +55,9 @@ class Stmt:
                 self.expr: Expr = information["expr"]
             case _:
                 raise NotImplemented(f"not implemented stmt type: {tag}")
+            
+    def __str__(self):
+        return f"{self.__dict__}"
 
 class FuncDecl:
     func_name: str
@@ -66,3 +72,5 @@ class FuncDecl:
         self.return_type = return_type
         self.stmt = stmt
 
+    def __str__(self):
+        return f"{self.__dict__}"
