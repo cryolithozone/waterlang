@@ -73,9 +73,6 @@ class Parser:
         if stmt.tag is StmtType.BlockStmt:
             if not self.expect(TType.KW, [Kw.FUNC]):
                 raise BaseException(f"{self.prev().loc} expected function definition block to end with keyword \"func\"")
-        else:
-            if not self.expect(TType.SEMI):
-                raise BaseException(f"{self.prev().loc} expected function definition statement to end with a semicolon")
         func_decl = FuncDecl(func_name, arg_list, return_type, stmt)
         self.ast.append(func_decl)
 
