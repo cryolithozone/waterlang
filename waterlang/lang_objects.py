@@ -43,7 +43,20 @@ class Expr:
                 raise NotImplemented(f"not implemented expr type: {tag}")
             
     def __str__(self):
-        return f"{self.__dict__}"
+        return self.to_str()
+
+    def to_str(self, ident = 0) -> str:
+        res = []
+        for key, value in self.__dict__.items():
+            res.append(" "*ident*2)
+            res.append(f"{key} = ")
+            if isinstance(value, Expr):
+                res.append(f"\n{value.to_str(ident + 1)}")
+            else:
+                res.append(f"{value}")
+            res.append("\n")
+        return "".join(res)
+
 
 class Stmt:
     def __init__(self, tag: StmtType, information: dict[str, Any]):
@@ -57,7 +70,11 @@ class Stmt:
                 raise NotImplemented(f"not implemented stmt type: {tag}")
             
     def __str__(self):
-        return f"{self.__dict__}"
+        match self.tag:
+            case StmtType.BlockStmt:
+                return f"{self.tag}: [{"\n".join(str(s) for s in self.stmts)}]"
+            case StmtType.ReturnStmt:
+                return f"{self.tag}: {self.expr}"
 
 class FuncDecl:
     func_name: str
@@ -73,4 +90,4 @@ class FuncDecl:
         self.stmt = stmt
 
     def __str__(self):
-        return f"{self.__dict__}"
+        return f"{self.func_name} ({self.arg_list}) -> {self.return_type}: \n {self.stmt}"
