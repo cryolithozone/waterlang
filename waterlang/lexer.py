@@ -163,6 +163,12 @@ class Lexer:
                     self.tokens.append(tok)
                     self.cur += 1
                     self.col += 1
+                case _:
+                    msg = f"unknown symbol {c}"
+                    tok = Token(TType.ERROR, self.cur_loc(), msg)
+                    self.tokens.append(tok)
+                    self.cur += 1
+                    self.col += 1
         eof = Token(TType.EOF, self.cur_loc(), None)
         self.tokens.append(eof)
         return self.tokens
