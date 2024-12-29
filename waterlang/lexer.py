@@ -11,6 +11,7 @@ class TType(Enum):
     NUM = auto()
     OP = auto()
     EOF = auto()
+    ERROR = auto()
 
 class Kw(Enum):
     FUNC = auto()
