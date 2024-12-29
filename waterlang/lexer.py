@@ -139,7 +139,7 @@ class Lexer:
                 case "-":
                     next_c = self.get(self.cur + 1)
                     if next_c is not None and next_c == ">":
-                        tok = Token(TType.ARROW, self.cur_loc(), None)
+                        tok = Token(TType.ARROW, self.cur_loc(), "->")
                         self.tokens.append(tok)
                         self.cur += 2
                         self.col += 2
@@ -166,17 +166,17 @@ class Lexer:
                     self.cur += 1
                     self.col += 1
                 case "(":
-                    tok = Token(TType.L_PAREN, self.cur_loc(), None)
+                    tok = Token(TType.L_PAREN, self.cur_loc(), "(")
                     self.tokens.append(tok)
                     self.cur += 1
                     self.col += 1
                 case ")":
-                    tok = Token(TType.R_PAREN, self.cur_loc(), None)
+                    tok = Token(TType.R_PAREN, self.cur_loc(), ")")
                     self.tokens.append(tok)
                     self.cur += 1
                     self.col += 1
                 case ";":
-                    tok = Token(TType.SEMI, self.cur_loc(), None)
+                    tok = Token(TType.SEMI, self.cur_loc(), ";")
                     self.tokens.append(tok)
                     self.cur += 1
                     self.col += 1
