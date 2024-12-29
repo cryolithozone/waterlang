@@ -1,1 +1,1 @@
-import waterlang.lexer
+from waterlang import lexer
