@@ -9,8 +9,14 @@ def main() -> None:
     in_file_name = args[1]
     with open(in_file_name, "r") as in_file:
         lexer = waterlang.lexer.Lexer(in_file, in_file_name)
-        for tok in lexer.lex():
-            print(tok)
+        lexer.lex()
+        result = lexer.report()
+        if not result.success:
+            for tok in result.tokens:
+                print("ERROR:", tok.loc, tok.value)
+        else:
+            for tok in result.tokens:
+                print(tok)
 
 if __name__ == "__main__":
     main()
