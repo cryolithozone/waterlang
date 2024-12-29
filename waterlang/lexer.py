@@ -1,6 +1,6 @@
 from enum import Enum, auto
 from dataclasses import dataclass
-from typing import TextIO, List
+from typing import TextIO, List, Any
 
 class TType(Enum):
     KW = auto()
@@ -63,7 +63,7 @@ class Location:
 class Token:
     ttype: TType
     loc: Location
-    value: int
+    value: Any
 
 
 class Lexer:
