@@ -1,13 +1,13 @@
 from enum import Enum, auto
 from dataclasses import dataclass
-from typing import List, Any
+from typing import List, Any, Union
 from waterlang.lexer import Token
 
 class ValueType(Enum):
     Int = auto()
 
     @staticmethod
-    def from_str(s: str) -> "ValueType" | None:
+    def from_str(s: str) -> Union["ValueType", None]:
         match s:
             case "int":
                 return ValueType.Int
