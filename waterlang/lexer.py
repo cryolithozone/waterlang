@@ -64,11 +64,17 @@ class Location:
     line: int
     col: int
 
+    def __str__(self):
+        return f"at {self.file}:{self.line+1}:{self.col+1}:"
+
 @dataclass
 class Token:
     ttype: TType
     loc: Location
     value: Any
+    
+    def __str__(self):
+        return f"{self.loc} {self.ttype}: {self.value}"
 
 @dataclass
 class LexResult:
