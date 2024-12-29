@@ -32,6 +32,7 @@ class Expr:
                 self.left: Expr = information["left"]
                 self.right: Expr = information["right"]
             case ExprType.Unary:
+                self.negated: bool = information["negated"]
                 self.expr: Expr = information["expr"]
             case ExprType.Literal:
                 self.value: Any = information["value"]
