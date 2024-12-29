@@ -6,6 +6,10 @@ from waterlang.lexer import Token
 class ValueType(Enum):
     Int = auto()
 
+    TABLE = {
+        "int": Int
+    }
+    
 class StmtType(Enum):
     ReturnStmt = auto()
 
