@@ -6,11 +6,16 @@ from waterlang.lexer import Token
 class ValueType(Enum):
     Int = auto()
 
-    TABLE = {
-        "int": Int
-    }
+    @staticmethod
+    def from_str(s: str) -> "ValueType" | None:
+        match s:
+            case "int":
+                return ValueType.Int
+            case _:
+                return None
     
 class StmtType(Enum):
+    BlockStmt = auto()
     ReturnStmt = auto()
 
 class ExprType(Enum):
@@ -40,6 +45,8 @@ class Stmt:
     def __init__(self, tag: StmtType, information: dict[str, Any]):
         self.tag = tag
         match self.tag:
+            case StmtType.BlockStmt:
+                self.stmts: List[Stmt] = information["stmts"]
             case StmtType.ReturnStmt:
                 self.expr: Expr = information["expr"]
             case _:
@@ -49,12 +56,12 @@ class FuncDecl:
     func_name: str
     arg_list: List[Token]
     return_type: ValueType 
-    block: List[Stmt]
+    stmt: Stmt
 
-    def __init__(self, func_name: str, arg_list: List[Token], return_type: ValueType, block: List[Stmt]):
+    def __init__(self, func_name: str, arg_list: List[Token], return_type: ValueType, stmt: Stmt):
         self.func_name = func_name
         assert arg_list == [], "function arguments not supported yet"
         self.arg_list = arg_list
         self.return_type = return_type
-        self.block = block
+        self.stmt = stmt
 
