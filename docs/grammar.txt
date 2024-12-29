@@ -5,9 +5,10 @@ arg_list = { }
 block = "begin" { stmt ";" }* "end" | stmt ";"
 stmt = return_stmt 
 return_stmt = "return" expr
-expr = term { [ ("+"|"-") expr ] }*
-term = factor { [ ("*"|"/") term ] }*
-factor = ["-"] primary
+expr = term
+term = factor { [ ("+"|"-") term ] }*
+factor = unary { [ ("*"|"/") factor ] }*
+unary = ["-"] primary
 primary = NUMLIT | "(" expr ")"
 
 TYPE = "int" | "none"
