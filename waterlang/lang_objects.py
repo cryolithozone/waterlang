@@ -30,6 +30,7 @@ class Expr:
         match self.tag:
             case ExprType.Binary:
                 self.left: Expr = information["left"]
+                self.op: Expr = information["op"]
                 self.right: Expr = information["right"]
             case ExprType.Unary:
                 self.negated: bool = information["negated"]
