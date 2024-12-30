@@ -12,6 +12,7 @@ class TType(Enum):
     NUM = auto()
     OP = auto()
     SEMI = auto()
+    COLON = auto()
     EOF = auto()
     ERROR = auto()
 
@@ -21,6 +22,8 @@ class Kw(Enum):
     BEGIN = auto()
     END = auto()
     RETURN = auto()
+    VAR = auto()
+    CONST = auto()
 
     @staticmethod
     def from_str(s: str):
@@ -35,6 +38,10 @@ class Kw(Enum):
                 return Kw.END
             case "return":
                 return Kw.RETURN
+            case "var":
+                return Kw.VAR
+            case "const":
+                return Kw.CONST
             case _:
                 raise ValueError(f"Unknown keyword {s}")
 
@@ -206,7 +213,10 @@ class Lexer:
         ttype = None
         value: None | Kw | str = None
         match buf:
-            case buf if buf == "func" or buf == "is" or buf == "begin" or buf == "end" or buf == "return":
+            case buf if buf in [
+                "begin", "end", "func", "is",
+                "return", "var", "const"
+            ]:
                 ttype = TType.KW
                 value = Kw.from_str(buf)
             case _:
