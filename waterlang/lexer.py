@@ -13,6 +13,7 @@ class TType(Enum):
     OP = auto()
     SEMI = auto()
     COLON = auto()
+    ASGN = auto()
     EOF = auto()
     ERROR = auto()
 
@@ -197,6 +198,16 @@ class Lexer:
                     self.col += 1
                 case ";":
                     tok = Token(TType.SEMI, self.cur_loc(), ";")
+                    self.tokens.append(tok)
+                    self.cur += 1
+                    self.col += 1
+                case ":":
+                    tok = Token(TType.COLON, self.cur_loc(), ":")
+                    self.tokens.append(tok)
+                    self.cur += 1
+                    self.col += 1
+                case "=":
+                    tok = Token(TType.ASGN, self.cur_loc(), "=")
                     self.tokens.append(tok)
                     self.cur += 1
                     self.col += 1
