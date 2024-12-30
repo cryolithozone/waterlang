@@ -1,5 +1,6 @@
 import waterlang
 import sys
+import subprocess as sp
 
 def print_ast(ast: list[waterlang.parser.FuncDecl]) -> None:
     for fdecl in ast:
@@ -26,6 +27,7 @@ def main() -> None:
     with open(out_file_name + ".cpp", "w") as out_file:
         translator = waterlang.translator.Translator(parser.ast, out_file)
         translator.translate()
+    sp.run(["g++", out_file_name + ".cpp", "-o", out_file_name, "-g"])
 
 
 if __name__ == "__main__":
