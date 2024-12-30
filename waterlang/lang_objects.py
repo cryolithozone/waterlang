@@ -81,7 +81,7 @@ class Stmt:
                 self.expr: Expr = information["expr"]
             case StmtType.VarDeclStmt:
                 self.var: Variable = information["var"]
-                self.initializer: Expr = information["initializer"]
+                self.initializer: Expr | None = information["initializer"]
             case _:
                 raise NotImplemented(f"not implemented stmt type: {tag}")
             
