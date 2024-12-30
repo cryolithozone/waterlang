@@ -3,13 +3,14 @@ func_decl = "func" IDENT "(" arg_list ")" "->" TYPE "is" func_body
 func_body = block "func" | stmt ";"
 arg_list = { }
 block = "begin" { stmt ";" }* "end" | stmt ";"
-stmt = return_stmt 
+stmt = return_stmt | var_decl_stmt
 return_stmt = "return" expr
 expr = term
 term = factor { [ ("+"|"-") term ] }*
 factor = unary { [ ("*"|"/") factor ] }*
 unary = ["-"] primary
-primary = NUMLIT | "(" expr ")"
+primary = NUMLIT | "(" expr ")" | IDENT
+var_decl_stmt = "var" IDENT ":" IDENT ["=" expr] | "const" IDENT ":" IDENT "=" expr
 
 TYPE = "int" | "none"
 NUMLIT = NON_ZERO_DIGIT { DIGIT }*
