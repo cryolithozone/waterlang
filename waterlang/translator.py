@@ -23,14 +23,16 @@ class Translator:
         for arg in self.current_subtree.arg_list:
             # No arguments support yet...
             pass
+        self.out_file.write(")\n")
         if self.current_subtree.stmt.tag is StmtType.BlockStmt:
             self.current_subtree = self.current_subtree.stmt
             self.stmt()
         else:
-            self.out_file.write(")\n{\n")
+            self.out_file.write("{\n")
             self.current_subtree = self.current_subtree.stmt
             self.stmt()
-            self.out_file.write("\n}\n")
+            self.out_file.write("\n}")
+        self.out_file.write("\n\n")
 
     def stmt(self) -> None:
         assert isinstance(self.current_subtree, Stmt), "expected Stmt in stmt()"
@@ -41,11 +43,11 @@ class Translator:
                 self.expr()
                 self.out_file.write(";")
             case StmtType.BlockStmt:
-                self.out_file.write("{")
+                self.out_file.write("{\n")
                 for stmt in self.current_subtree.stmts:
                     self.current_subtree = stmt
                     self.stmt()
-                self.out_file.write("}")
+                self.out_file.write("\n}")
             case _:
                 raise NotImplementedError(f"compiling statements of type {self.current_subtree.tag} is not supported")
     
@@ -53,10 +55,11 @@ class Translator:
         assert isinstance(self.current_subtree, Expr), "expected Expr in expr()"
         match self.current_subtree.tag:
             case ExprType.Literal:
-                self.out_file.write(self.current_subtree.value)
+                self.out_file.write(str(self.current_subtree.value))
             case ExprType.Grouping:
                 self.out_file.write("(")
                 self.current_subtree = self.current_subtree.expr
+                self.expr()
                 self.out_file.write(")")
             case ExprType.Unary:
                 if self.current_subtree.negated:
