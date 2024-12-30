@@ -80,6 +80,12 @@ class Translator:
                     self.current_subtree = self.current_subtree.initializer
                     self.expr()
                 self.write(";")
+            case StmtType.ReasgnStmt:
+                var = self.current_subtree.var
+                self.write(var.ident + " = ")
+                self.current_subtree = self.current_subtree.expr
+                self.expr()
+                self.write(";")
             case _:
                 raise NotImplementedError(f"compiling statements of type {self.current_subtree.tag} is not supported")
     
