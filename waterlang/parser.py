@@ -12,6 +12,7 @@ class Parser:
         self.tokens = tokens
         self.cur = 0
         self.ast = []
+        self.variables = {}
 
     def peek(self, offset: int = 0) -> Token | None:
         try:
