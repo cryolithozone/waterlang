@@ -206,6 +206,14 @@ class Parser:
                 tag = ExprType.Literal
                 information["value"] = tok.value
                 information["type"] = ValueType.Int
+            case TType.IDENT:
+                var = next((var for var in self.variables.keys() if var.ident == tok.value), None)
+                if var is None:
+                    raise BaseException(f"{tok.loc} unknown variable")
+                if not self.variables[var]:
+                    raise BaseException(f"{tok.loc} use of uninitialized variable")
+                tag = ExprType.Variable
+                information["var"] = var
             case TType.L_PAREN:
                 tag = ExprType.Grouping
                 information["expr"] = self.expr()
