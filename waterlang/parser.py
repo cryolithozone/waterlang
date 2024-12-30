@@ -2,6 +2,26 @@ from typing import List, Dict
 from waterlang.lexer import Token, TType, Kw, Op
 from waterlang.lang_objects import *
 
+class Scope:
+    enclosing: "Scope" | None
+    variables: Dict[Variable, bool]
+
+    def __init__(self, enclosing: "Scope" | None):
+        self.enclosing = enclosing
+        self.variables = {}
+
+    def update(self, var: Variable, init: bool):
+        self.variables[var] = init
+
+    def get(self, ident: str) -> Variable | None:
+        var = next((var for var in self.variables.keys() if var.ident == ident), None)
+        if var is None:
+            if self.enclosing is None:
+                return None
+            return self.enclosing.get(ident)
+        return var
+
+
 class Parser:
     tokens: List[Token]
     cur: int
