@@ -73,6 +73,7 @@ class StmtType(Enum):
     BlockStmt = auto()
     ReturnStmt = auto()
     VarDeclStmt = auto()
+    ReasgnStmt = auto()
 
 class Stmt:
     def __init__(self, tag: StmtType, information: dict[str, Any]):
@@ -85,6 +86,9 @@ class Stmt:
             case StmtType.VarDeclStmt:
                 self.var: Variable = information["var"]
                 self.initializer: Expr | None = information["initializer"]
+            case StmtType.ReasgnStmt:
+                self.var = information["var"]
+                self.expr = information["expr"]
             case _:
                 raise NotImplemented(f"not implemented stmt type: {tag}")
             
@@ -96,6 +100,8 @@ class Stmt:
                 return f"{self.tag}: {self.expr}"
             case StmtType.VarDeclStmt:
                 return f"{"CONST" if self.var.const else "VAR"} {self.var} init with {self.initializer}"
+            case StmtType.ReasgnStmt:
+                return f"{self.var} reassigned to {self.expr}"
 
 class FuncDecl:
     func_name: str
