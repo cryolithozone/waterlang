@@ -24,6 +24,7 @@ class ValueType(Enum):
 class StmtType(Enum):
     BlockStmt = auto()
     ReturnStmt = auto()
+    VarDeclStmt = auto()
 
 class ExprType(Enum):
     Binary = auto()
@@ -64,6 +65,10 @@ class Expr:
                 res.append(f"{value}\n")
         return "".join(res)
 
+@dataclass
+class Variable:
+    ident: str
+    type: ValueType
 
 class Stmt:
     def __init__(self, tag: StmtType, information: dict[str, Any]):
@@ -73,6 +78,9 @@ class Stmt:
                 self.stmts: List[Stmt] = information["stmts"]
             case StmtType.ReturnStmt:
                 self.expr: Expr = information["expr"]
+            case StmtType.VarDeclStmt:
+                self.var: Variable = information["var"]
+                self.initializer: Expr = information["initializer"]
             case _:
                 raise NotImplemented(f"not implemented stmt type: {tag}")
             
