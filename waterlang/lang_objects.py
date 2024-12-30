@@ -31,6 +31,7 @@ class ExprType(Enum):
     Unary = auto()
     Literal = auto()
     Grouping = auto()
+    Variable = auto()
 
 class Expr:
     def __init__(self, tag: ExprType, information: dict[str, Any]):
@@ -46,6 +47,8 @@ class Expr:
             case ExprType.Literal:
                 self.value: Any = information["value"]
                 self.type: ValueType = information["type"]
+            case ExprType.Variable:
+                self.var = information["var"]
             case ExprType.Grouping:
                 self.expr = information["expr"]
             case _:
