@@ -22,7 +22,7 @@ class Translator:
         self.out_file.write(self.current_subtree.func_name + "(")
         for arg in self.current_subtree.arg_list:
             # No arguments support yet...
-            pass
+            raise NotImplementedError("argument compilation is not supported")
         self.out_file.write(")\n")
         if self.current_subtree.stmt.tag is StmtType.BlockStmt:
             self.current_subtree = self.current_subtree.stmt
