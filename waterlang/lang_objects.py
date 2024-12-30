@@ -91,6 +91,8 @@ class Stmt:
                 return f"{self.tag}: [{"\n".join(str(s) for s in self.stmts)}]"
             case StmtType.ReturnStmt:
                 return f"{self.tag}: {self.expr}"
+            case StmtType.VarDeclStmt:
+                return f"{"CONST" if self.var.const else "VAR"} {self.var} init with {self.initializer}"
 
 class FuncDecl:
     func_name: str
