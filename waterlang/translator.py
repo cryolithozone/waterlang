@@ -69,6 +69,17 @@ class Translator:
                 self.nesting -= 1
                 self.indent()
                 self.write("}")
+            case StmtType.VarDeclStmt:
+                var = self.current_subtree.var
+                if var.const:
+                    self.write("const ")
+                self.write(var.type.to_cpp() + " ")
+                self.write(var.ident)
+                if self.current_subtree.initializer is not None:
+                    self.write(" = ")
+                    self.current_subtree = self.current_subtree.initializer
+                    self.expr()
+                self.write(";")
             case _:
                 raise NotImplementedError(f"compiling statements of type {self.current_subtree.tag} is not supported")
     
@@ -77,6 +88,8 @@ class Translator:
         match self.current_subtree.tag:
             case ExprType.Literal:
                 self.write(str(self.current_subtree.value))
+            case ExprType.Variable:
+                self.write(str(self.current_subtree.var.ident))
             case ExprType.Grouping:
                 self.write("(")
                 self.current_subtree = self.current_subtree.expr
@@ -97,3 +110,5 @@ class Translator:
                 self.write(op.value.to_cpp())
                 self.current_subtree = right
                 self.expr()
+            case _:
+                raise NotImplementedError(f"compiling expressions of type {self.current_subtree.tag} is not supported")
