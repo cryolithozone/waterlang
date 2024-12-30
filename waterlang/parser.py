@@ -111,6 +111,11 @@ class Parser:
                 information = self.constdecl()
                 if not self.expect(TType.SEMI):
                     raise BaseException(f"{self.prev().loc} expected a semicolon after simple statement")
+            case _ if tok.ttype is TType.IDENT:
+                tag = StmtType.ReasgnStmt
+                information = self.reasgn()
+                if not self.expect(TType.SEMI):
+                    raise BaseException(f"{self.prev().loc} expected a semicolon after simple statement")
             case _:
                 raise BaseException(f"{self.prev().loc} unexpected token")
 
@@ -154,6 +159,22 @@ class Parser:
         return {
             "var": var,
             "initializer": initializer
+        }
+    
+    def reasgn(self) -> dict[str, Any]:
+        tok = self.prev()
+        var = next((var for var in self.variables.keys() if var.ident == tok.value), None)
+        if var is None:
+            raise BaseException(f"{tok.loc} unknown variable")
+        if var.const:
+            raise BaseException(f"{tok.loc} cannot reassign a const variable")
+        self.variables[var] = True
+        if not self.expect(TType.ASGN):
+            raise BaseException(f"{self.prev().loc} expected assignment")
+        expr = self.expr()
+        return {
+            "var": var,
+            "expr": expr
         }
 
     def expr(self) -> Expr:
