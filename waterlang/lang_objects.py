@@ -65,7 +65,7 @@ class Expr:
                 res.append(f"{value}\n")
         return "".join(res)
 
-@dataclass
+@dataclass(frozen=True)
 class Variable:
     ident: str
     type: ValueType
