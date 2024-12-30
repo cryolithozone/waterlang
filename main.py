@@ -26,13 +26,22 @@ def main() -> None:
             print("ERROR:", tok.loc, tok.value)
             return
     parser = Parser(result.tokens)
-    parser.parse()
+    try:
+        parser.parse()
+    except BaseException as e:
+        print("ERROR:", e)
+        return   
     print_ast(parser.ast)
     for var in parser.variables:
         print(var)
     with open(out_file_name + ".cpp", "w") as out_file:
         translator = Translator(parser.ast, out_file)
-        translator.translate()
+        try:
+            translator.translate()
+        except BaseException as e:
+            sp.run(["rm", out_file_name + ".cpp"])
+            print("ERROR:", e)
+            return        
     sp.run(["g++", out_file_name + ".cpp", "-o", out_file_name, "-g"])
 
 
