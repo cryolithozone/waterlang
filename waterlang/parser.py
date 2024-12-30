@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Dict
 from waterlang.lexer import Token, TType, Kw, Op
 from waterlang.lang_objects import *
 
@@ -6,6 +6,7 @@ class Parser:
     tokens: List[Token]
     cur: int
     ast: List[FuncDecl]
+    variables: Dict[Variable, bool]
 
     def __init__(self, tokens: List[Token]):
         self.tokens = tokens
@@ -84,26 +85,76 @@ class Parser:
         
         tag = None
         information: dict[str, Any] = {}
-        if tok.value is Kw.BEGIN:
-            tag = StmtType.BlockStmt
-            block = []
-            cur_tok = self.peek()
-            while cur_tok is not None and cur_tok.value is not Kw.END:
-                block.append(self.stmt())
+        match tok.value:
+            case Kw.BEGIN:
+                tag = StmtType.BlockStmt
+                block = []
                 cur_tok = self.peek()
-            self.consume()
-            information["stmts"] = block
-        elif tok.value is Kw.RETURN:
-            tag = StmtType.ReturnStmt
-            information["expr"] = self.expr()
-            if not self.expect(TType.SEMI):
-                raise BaseException(f"{self.prev().loc} expected a semicolon after simple statement")
-        else:
-            raise BaseException(f"{self.prev().loc} expected compound statement (begin-end) or return keyword")
+                while cur_tok is not None and cur_tok.value is not Kw.END:
+                    block.append(self.stmt())
+                    cur_tok = self.peek()
+                self.consume()
+                information["stmts"] = block
+            case Kw.RETURN:
+                tag = StmtType.ReturnStmt
+                information["expr"] = self.expr()
+                if not self.expect(TType.SEMI):
+                    raise BaseException(f"{self.prev().loc} expected a semicolon after simple statement")
+            case Kw.VAR:
+                tag = StmtType.VarDeclStmt
+                information = self.vardecl()
+                if not self.expect(TType.SEMI):
+                    raise BaseException(f"{self.prev().loc} expected a semicolon after simple statement")
+            case Kw.CONST:
+                tag = StmtType.VarDeclStmt
+                information = self.constdecl()
+                if not self.expect(TType.SEMI):
+                    raise BaseException(f"{self.prev().loc} expected a semicolon after simple statement")
+            case _:
+                raise BaseException(f"{self.prev().loc} unexpected token")
 
         stmt = Stmt(tag, information)
         return stmt
     
+    def vardecl(self) -> dict[str, Any]:
+        if not self.expect(TType.IDENT):
+            raise BaseException(f"{self.prev().loc} expected identifier in declaration statement")
+        tok_var = self.prev()
+        if not self.expect(TType.COLON):
+            raise BaseException(f"{self.prev().loc} expected colon")
+        if not self.expect(TType.IDENT):
+            raise BaseException(f"{self.prev().loc} expected variable type")
+        tok_type = self.prev()
+        initializer = None
+        if self.expect(TType.ASGN):
+            initializer = self.expr()
+        var = Variable(tok_var.value, self.parse_type(tok_type.value), False)
+        self.variables[var] = initializer is not None
+        return {
+            "var": var,
+            "initializer": initializer
+        }
+    
+    def constdecl(self) -> dict[str, Any]:
+        if not self.expect(TType.IDENT):
+            raise BaseException(f"{self.prev().loc} expected identifier in declaration statement")
+        tok_var = self.prev()
+        if not self.expect(TType.COLON):
+            raise BaseException(f"{self.prev().loc} expected colon")
+        if not self.expect(TType.IDENT):
+            raise BaseException(f"{self.prev().loc} expected const type")
+        tok_type = self.prev()
+        initializer = None
+        if not self.expect(TType.ASGN):
+            raise BaseException(f"{self.prev().loc} const variable must always be initialized")
+        initializer = self.expr()
+        var = Variable(tok_var.value, self.parse_type(tok_type.value), True)
+        self.variables[var] = True
+        return {
+            "var": var,
+            "initializer": initializer
+        }
+
     def expr(self) -> Expr:
         return self.term()
     
