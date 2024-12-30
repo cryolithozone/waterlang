@@ -69,6 +69,7 @@ class Expr:
 class Variable:
     ident: str
     type: ValueType
+    const: bool
 
 class Stmt:
     def __init__(self, tag: StmtType, information: dict[str, Any]):
