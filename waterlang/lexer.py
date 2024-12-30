@@ -57,6 +57,19 @@ class Op(Enum):
                 return Op.SLASH
             case _:
                 raise ValueError(f"Unknown operation {s}")
+    
+    def to_cpp(self) -> str:
+        match self:
+            case Op.PLUS:
+                return "+"
+            case Op.MINUS:
+                return "-"
+            case Op.STAR:
+                return "*"
+            case Op.SLASH:
+                return "/"
+            case _:
+                raise ValueError(f"not supported direct translation to cpp: {self}")
 
 @dataclass
 class Location:
