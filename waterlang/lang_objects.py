@@ -20,11 +20,6 @@ class ValueType(Enum):
                 return "int"
             case _:
                 raise ValueError(f"not supported direct translation to cpp: {self}")
-    
-class StmtType(Enum):
-    BlockStmt = auto()
-    ReturnStmt = auto()
-    VarDeclStmt = auto()
 
 class ExprType(Enum):
     Binary = auto()
@@ -73,6 +68,11 @@ class Variable:
     ident: str
     type: ValueType
     const: bool
+
+class StmtType(Enum):
+    BlockStmt = auto()
+    ReturnStmt = auto()
+    VarDeclStmt = auto()
 
 class Stmt:
     def __init__(self, tag: StmtType, information: dict[str, Any]):
