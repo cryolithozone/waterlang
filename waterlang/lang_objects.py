@@ -13,6 +13,13 @@ class ValueType(Enum):
                 return ValueType.Int
             case _:
                 return None
+            
+    def to_cpp(self) -> str:
+        match self:
+            case ValueType.Int:
+                return "int"
+            case _:
+                raise ValueError(f"not supported direct translation to cpp: {self}")
     
 class StmtType(Enum):
     BlockStmt = auto()
