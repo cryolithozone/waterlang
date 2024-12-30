@@ -47,7 +47,7 @@ class Translator:
                 for stmt in self.current_subtree.stmts:
                     self.current_subtree = stmt
                     self.stmt()
-                self.out_file.write("\n}")
+                self.out_file.write("\n}\n")
             case _:
                 raise NotImplementedError(f"compiling statements of type {self.current_subtree.tag} is not supported")
     
