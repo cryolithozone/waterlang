@@ -12,11 +12,30 @@ def print_ast(ast: list[FuncDecl]) -> None:
 
 def main() -> None:
     args = sys.argv
+    remove_cpp_source = True
+    compile_cpp = True
+    check_only = False
     if len(args) < 3:
-        print("Error: no input and output file provided")
+        print("ERROR: no input and output file provided")
         return
     in_file_name = args[1]
     out_file_name = args[2]
+    if len(args) > 3:
+        parameters = args[3:]
+        for param in parameters:
+            match param:
+                case "--check":
+                    check_only = True
+                case "--cpp":
+                    remove_cpp_source = False
+                case "--no-compile":
+                    compile_cpp = False
+                case _:
+                    print(f"ERROR: unknown parameter {param}")
+                    return
+    if not compile_cpp and remove_cpp_source:
+        print("ERROR: invalid combination of parameters")
+        return
     with open(in_file_name, "r") as in_file:
         lexer = Lexer(in_file, in_file_name)
         lexer.lex()
@@ -30,9 +49,10 @@ def main() -> None:
         parser.parse()
     except BaseException as e:
         print("ERROR:", e)
-        return   
-    print_ast(parser.ast)
-    print(parser.scope)
+        return
+    if check_only:
+        print(f"Checking {in_file_name} finished successfully.")
+        return
     with open(out_file_name + ".cpp", "w") as out_file:
         translator = Translator(parser.ast, out_file)
         try:
@@ -40,8 +60,23 @@ def main() -> None:
         except BaseException as e:
             sp.run(["rm", out_file_name + ".cpp"])
             print("ERROR:", e)
-            return        
-    sp.run(["g++", out_file_name + ".cpp", "-o", out_file_name, "-g"])
+            return
+    if not remove_cpp_source:
+        print(f"C++ code written to {out_file_name + ".cpp"}")
+    if compile_cpp:
+        gpp_result = sp.run(["g++", out_file_name + ".cpp", "-o", out_file_name, "-g"], capture_output=True)
+        if gpp_result.returncode != 0:
+            # The waterlang cli will leave the C++ file intact even if the --cpp option is not set.
+            # This is because all of the analysis must happen outside of translation,
+            # and if the translated code is wrong, then the waterlang compiler is not working correctly.
+            # Basically, this is done so that compiler bugs can be reported.
+            print("ERROR (while compiling C++ source):\n", gpp_result.stderr)
+            return
+        else:
+            print(f"Compilation successful: {out_file_name}")
+
+    if remove_cpp_source:
+        sp.run(["rm", out_file_name + ".cpp"])
 
 
 if __name__ == "__main__":
