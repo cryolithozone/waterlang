@@ -32,8 +32,7 @@ def main() -> None:
         print("ERROR:", e)
         return   
     print_ast(parser.ast)
-    for var in parser.variables:
-        print(var)
+    print(parser.scope)
     with open(out_file_name + ".cpp", "w") as out_file:
         translator = Translator(parser.ast, out_file)
         try:

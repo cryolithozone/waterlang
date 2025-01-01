@@ -29,6 +29,11 @@ class Scope:
                 raise ValueError("logic error: attempt to determine if an unknown variable is initialized")
             return self.enclosing.is_initialized(var)
         return self.variables[var]
+    
+    def __str__(self) -> str:
+        if self.enclosing is not None:
+            return f"[\n{self.enclosing}]\n"
+        return "; ".join(str(var) for var in self.variables.keys())
 
 
 class Parser:
