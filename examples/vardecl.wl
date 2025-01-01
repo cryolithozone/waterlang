@@ -5,7 +5,7 @@ begin
     begin
         b = 5;
         var c: int = b;
-        const _01INTERNAL_CONST: int = 41;
+        const _01INTERNAL_CONST: int = c + 36;
     end
     return a + _01INTERNAL_CONST - b;
 end func
