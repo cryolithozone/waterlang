@@ -11,7 +11,7 @@ class Scope:
         self.variables = {}
 
     def update(self, var: Variable, init: bool):
-        if var not in self.variables.keys() and self.enclosing is not None:
+        if self.enclosing is not None and self.enclosing.get(var.ident) is not None:
             self.enclosing.update(var, init)
         self.variables[var] = init
 
