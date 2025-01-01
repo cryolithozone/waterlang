@@ -3,9 +3,10 @@ begin
     var a: int = 6;
     var b: int;
     begin
-        b = 5;
+        b = 3;
         var c: int = b;
-        const _01INTERNAL_CONST: int = c + 36;
+        b = c + 2;
     end
+    const _01INTERNAL_CONST: int = b + 36;
     return a + _01INTERNAL_CONST - b;
 end func
