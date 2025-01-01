@@ -20,7 +20,7 @@ Parameters:
           """)
 
 
-def main() -> None:
+def main() -> int:
     args = sys.argv
     remove_cpp_source = True
     compile_cpp = True
@@ -29,14 +29,15 @@ def main() -> None:
         try:
             if args[1] == "--help":
                 usage(args[0])
+                return 0
             else:
                 usage(args[0])
                 print(f"ERROR: unknown parameter {args[1]}")
+                return 2
         except IndexError:
             usage(args[0])
             print("ERROR: no input and output file provided")
-        finally:
-            return
+            return 2
     in_file_name = args[1]
     out_file_name = args[2]
     if len(args) > 3:
@@ -51,11 +52,11 @@ def main() -> None:
                     compile_cpp = False
                 case "--help":
                     usage(args[0])
-                    return
+                    return 0
                 case _:
                     usage(args[0])
                     print(f"ERROR: unknown parameter {param}")
-                    return
+                    return 2
     if not compile_cpp:
         remove_cpp_source = False
     with open(in_file_name, "r") as in_file:
@@ -65,16 +66,16 @@ def main() -> None:
     if not result.success:
         for tok in result.tokens:
             print("ERROR:", tok.loc, tok.value)
-            return
+            return 3
     parser = Parser(result.tokens)
     try:
         parser.parse()
     except BaseException as e:
         print("ERROR:", e)
-        return
+        return 4
     if check_only:
         print(f"Checking {in_file_name} finished successfully.")
-        return
+        return 0
     with open(out_file_name + ".cpp", "w") as out_file:
         translator = Translator(parser.ast, out_file)
         try:
@@ -82,7 +83,7 @@ def main() -> None:
         except BaseException as e:
             sp.run(["rm", out_file_name + ".cpp"])
             print("ERROR:", e)
-            return
+            return 5
     if not remove_cpp_source:
         print(f"C++ code written to {out_file_name + ".cpp"}")
     if compile_cpp:
@@ -93,13 +94,18 @@ def main() -> None:
             # and if the translated code is wrong, then the waterlang compiler is not working correctly.
             # Basically, this is done so that compiler bugs can be reported.
             print("ERROR (while compiling C++ source):\n", gpp_result.stderr)
-            return
+            return gpp_result.returncode
         else:
             print(f"Compilation successful: {out_file_name}")
 
     if remove_cpp_source:
-        sp.run(["rm", out_file_name + ".cpp"])
+        rm_result = sp.run(["rm", out_file_name + ".cpp"], capture_output=True)
+        if rm_result.returncode != 0:
+            print("ERROR (while deleting the c++ source):", rm_result.stderr)
+            return rm_result.returncode
 
+    return 0
 
 if __name__ == "__main__":
-    main()
+    code = main()
+    sys.exit(code)
