@@ -10,14 +10,33 @@ def print_ast(ast: list[FuncDecl]) -> None:
         print("-------")
         print(fdecl)
 
+def usage(program_name) -> None:
+    print(f"""
+{program_name} <IN> <OUT> [PARAMS...]
+Parameters:
+--check         check the correctness of the program without compilation
+--cpp           don't remove the c++ source 
+--no-compile    don't compile the c++ source. implies --cpp
+          """)
+
+
 def main() -> None:
     args = sys.argv
     remove_cpp_source = True
     compile_cpp = True
     check_only = False
     if len(args) < 3:
-        print("ERROR: no input and output file provided")
-        return
+        try:
+            if args[1] == "--help":
+                usage(args[0])
+            else:
+                usage(args[0])
+                print(f"ERROR: unknown parameter {args[1]}")
+        except IndexError:
+            usage(args[0])
+            print("ERROR: no input and output file provided")
+        finally:
+            return
     in_file_name = args[1]
     out_file_name = args[2]
     if len(args) > 3:
@@ -30,12 +49,15 @@ def main() -> None:
                     remove_cpp_source = False
                 case "--no-compile":
                     compile_cpp = False
+                case "--help":
+                    usage(args[0])
+                    return
                 case _:
+                    usage(args[0])
                     print(f"ERROR: unknown parameter {param}")
                     return
-    if not compile_cpp and remove_cpp_source:
-        print("ERROR: invalid combination of parameters")
-        return
+    if not compile_cpp:
+        remove_cpp_source = False
     with open(in_file_name, "r") as in_file:
         lexer = Lexer(in_file, in_file_name)
         lexer.lex()
