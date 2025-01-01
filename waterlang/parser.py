@@ -1,16 +1,18 @@
-from typing import List, Dict
+from typing import List, Dict, Union
 from waterlang.lexer import Token, TType, Kw, Op
 from waterlang.lang_objects import *
 
 class Scope:
-    enclosing: "Scope" | None
+    enclosing: Union["Scope", None]
     variables: Dict[Variable, bool]
 
-    def __init__(self, enclosing: "Scope" | None):
+    def __init__(self, enclosing: Union["Scope", None]):
         self.enclosing = enclosing
         self.variables = {}
 
     def update(self, var: Variable, init: bool):
+        if var not in self.variables.keys() and self.enclosing is not None:
+            self.enclosing.update(var, init)
         self.variables[var] = init
 
     def get(self, ident: str) -> Variable | None:
@@ -20,19 +22,26 @@ class Scope:
                 return None
             return self.enclosing.get(ident)
         return var
+    
+    def is_initialized(self, var: Variable) -> bool:
+        if var not in self.variables.keys():
+            if self.enclosing is None:
+                raise ValueError("logic error: attempt to determine if an unknown variable is initialized")
+            return self.enclosing.is_initialized(var)
+        return self.variables[var]
 
 
 class Parser:
     tokens: List[Token]
     cur: int
     ast: List[FuncDecl]
-    variables: Dict[Variable, bool]
+    scope: Scope
 
     def __init__(self, tokens: List[Token]):
         self.tokens = tokens
         self.cur = 0
         self.ast = []
-        self.variables = {}
+        self.scope = Scope(None)
 
     def peek(self, offset: int = 0) -> Token | None:
         try:
@@ -108,6 +117,7 @@ class Parser:
         information: dict[str, Any] = {}
         match tok.value:
             case Kw.BEGIN:
+                self.scope = Scope(self.scope)
                 tag = StmtType.BlockStmt
                 block = []
                 cur_tok = self.peek()
@@ -115,6 +125,8 @@ class Parser:
                     block.append(self.stmt())
                     cur_tok = self.peek()
                 self.consume()
+                assert self.scope.enclosing is not None, "impossible for there to not be an enclosing scope when it is created at the beginning of the case statement"
+                self.scope = self.scope.enclosing
                 information["stmts"] = block
             case Kw.RETURN:
                 tag = StmtType.ReturnStmt
@@ -155,7 +167,7 @@ class Parser:
         if self.expect(TType.ASGN):
             initializer = self.expr()
         var = Variable(tok_var.value, self.parse_type(tok_type.value), False)
-        self.variables[var] = initializer is not None
+        self.scope.update(var, initializer is not None)
         return {
             "var": var,
             "initializer": initializer
@@ -175,7 +187,7 @@ class Parser:
             raise BaseException(f"{self.prev().loc} const variable must always be initialized")
         initializer = self.expr()
         var = Variable(tok_var.value, self.parse_type(tok_type.value), True)
-        self.variables[var] = True
+        self.scope.update(var, True)
         return {
             "var": var,
             "initializer": initializer
@@ -183,12 +195,12 @@ class Parser:
     
     def reasgn(self) -> dict[str, Any]:
         tok = self.prev()
-        var = next((var for var in self.variables.keys() if var.ident == tok.value), None)
+        var = self.scope.get(tok.value)
         if var is None:
             raise BaseException(f"{tok.loc} unknown variable")
         if var.const:
             raise BaseException(f"{tok.loc} cannot reassign a const variable")
-        self.variables[var] = True
+        self.scope.update(var, True)
         if not self.expect(TType.ASGN):
             raise BaseException(f"{self.prev().loc} expected assignment")
         expr = self.expr()
@@ -248,10 +260,10 @@ class Parser:
                 information["value"] = tok.value
                 information["type"] = ValueType.Int
             case TType.IDENT:
-                var = next((var for var in self.variables.keys() if var.ident == tok.value), None)
+                var = self.scope.get(tok.value)
                 if var is None:
                     raise BaseException(f"{tok.loc} unknown variable")
-                if not self.variables[var]:
+                if not self.scope.is_initialized(var):
                     raise BaseException(f"{tok.loc} use of uninitialized variable")
                 tag = ExprType.Variable
                 information["var"] = var
