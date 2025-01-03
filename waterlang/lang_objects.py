@@ -15,11 +15,7 @@ class ValueType(Enum):
                 return None
             
     def to_cpp(self) -> str:
-        match self:
-            case ValueType.Int:
-                return "int"
-            case _:
-                raise ValueError(f"not supported direct translation to cpp: {self}")
+        return "wl::" + self.name
 
 class ExprType(Enum):
     Binary = auto()
