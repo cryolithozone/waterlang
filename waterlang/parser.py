@@ -41,12 +41,14 @@ class Parser:
     cur: int
     ast: List[FuncDecl]
     scope: Scope
+    has_main: bool
 
-    def __init__(self, tokens: List[Token]):
+    def __init__(self, tokens: List[Token], has_main: bool = True):
         self.tokens = tokens
         self.cur = 0
         self.ast = []
         self.scope = Scope(None)
+        self.has_main = has_main
 
     def peek(self, offset: int = 0) -> Token | None:
         try:
@@ -87,8 +89,9 @@ class Parser:
     def parse(self) -> None:
         while not self.at_eof():
             self.func_decl()
-        if "main" not in map(lambda f: f.func_name, filter(lambda d: isinstance(d, FuncDecl), self.ast)):
-            raise BaseException(f"{self.tokens[0].loc} no main function defined; pass --no-main if this is intentional")
+        if self.has_main:
+            if "main" not in map(lambda f: f.func_name, filter(lambda d: isinstance(d, FuncDecl), self.ast)):
+                raise BaseException(f"{self.tokens[0].loc} no main function defined; pass --no-main if this is intentional")
 
     def func_decl(self) -> None:
         if not self.expect(TType.KW, [Kw.FUNC]):

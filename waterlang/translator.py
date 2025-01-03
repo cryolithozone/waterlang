@@ -7,11 +7,13 @@ class Translator:
     out_file: TextIO
     current_subtree: FuncDecl | Stmt | Expr
     nesting: int
+    has_main: bool
 
-    def __init__(self, ast: List[FuncDecl], out_file: TextIO):
+    def __init__(self, ast: List[FuncDecl], out_file: TextIO, has_main: bool = True):
         self.ast = ast
         self.out_file = out_file
         self.nesting = 0
+        self.has_main = has_main
 
     def write(self, content: str) -> None:
         self.out_file.write(content)
@@ -24,7 +26,8 @@ class Translator:
         for decl in self.ast:
             self.current_subtree = decl
             self.func_decl()
-        self.write("""
+        if self.has_main:
+            self.write("""
 int main() 
 {
   return (int)WL_Main();

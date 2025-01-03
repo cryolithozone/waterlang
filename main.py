@@ -25,6 +25,7 @@ def main() -> int:
     remove_cpp_source = True
     compile_cpp = True
     check_only = False
+    no_main = False
     if len(args) < 3:
         try:
             if args[1] == "--help":
@@ -50,6 +51,8 @@ def main() -> int:
                     remove_cpp_source = False
                 case "--no-compile":
                     compile_cpp = False
+                case "--no-main":
+                    no_main = True
                 case "--help":
                     usage(args[0])
                     return 0
@@ -67,7 +70,7 @@ def main() -> int:
         for tok in result.tokens:
             print("ERROR:", tok.loc, tok.value)
             return 3
-    parser = Parser(result.tokens)
+    parser = Parser(result.tokens, not no_main)
     try:
         parser.parse()
     except BaseException as e:
@@ -77,7 +80,7 @@ def main() -> int:
         print(f"Checking {in_file_name} finished successfully.")
         return 0
     with open(out_file_name + ".cpp", "w") as out_file:
-        translator = Translator(parser.ast, out_file)
+        translator = Translator(parser.ast, out_file, not no_main)
         try:
             translator.translate()
         except BaseException as e:
