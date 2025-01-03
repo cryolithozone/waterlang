@@ -20,6 +20,7 @@ class Translator:
         self.out_file.write(" "*self.nesting*2)
 
     def translate(self) -> None:
+        self.write("#include \"lib/waterlang.hpp\"")
         for decl in self.ast:
             self.current_subtree = decl
             self.func_decl()
