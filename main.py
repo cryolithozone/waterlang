@@ -90,7 +90,11 @@ def main() -> int:
     if not remove_cpp_source:
         print(f"C++ code written to {out_file_name + ".cpp"}")
     if compile_cpp:
-        gpp_result = sp.run(["g++", "-I", ".", out_file_name + ".cpp", "-o", out_file_name, "-g"], capture_output=True)
+        gpp_args = ["g++", "-I", ".", out_file_name + ".cpp", "-o", out_file_name, "-g"]
+        if no_main:
+            gpp_args[5] += ".so"
+            gpp_args += ["-c"]
+        gpp_result = sp.run(gpp_args, capture_output=True)
         if gpp_result.returncode != 0:
             # The waterlang cli will leave the C++ file intact even if the --cpp option is not set.
             # This is because all of the analysis must happen outside of translation,
