@@ -24,11 +24,20 @@ class Translator:
         for decl in self.ast:
             self.current_subtree = decl
             self.func_decl()
+        self.write("""
+int main() 
+{
+  return (int)WL_Main();
+}
+""")
 
     def func_decl(self) -> None:
         assert isinstance(self.current_subtree, FuncDecl), "expected FuncDecl in func_decl()"
         self.write(self.current_subtree.return_type.to_cpp() + " ")
-        self.write(self.current_subtree.func_name + "(")
+        if self.current_subtree.func_name == "main":
+            self.write("WL_Main" + "(")
+        else:
+            self.write(self.current_subtree.func_name + "(")
         for arg in self.current_subtree.arg_list:
             # No arguments support yet...
             raise NotImplementedError("argument compilation is not supported")
