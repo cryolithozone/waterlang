@@ -93,7 +93,7 @@ def main() -> int:
             # This is because all of the analysis must happen outside of translation,
             # and if the translated code is wrong, then the waterlang compiler is not working correctly.
             # Basically, this is done so that compiler bugs can be reported.
-            print("ERROR (while compiling C++ source):\n", str(gpp_result.stderr))
+            print("ERROR (while compiling C++ source):\n", gpp_result.stderr.decode("utf8"))
             return gpp_result.returncode
         else:
             print(f"Compilation successful: {out_file_name}")
@@ -101,7 +101,7 @@ def main() -> int:
     if remove_cpp_source:
         rm_result = sp.run(["rm", out_file_name + ".cpp"], capture_output=True)
         if rm_result.returncode != 0:
-            print("ERROR (while deleting the c++ source):", str(rm_result.stderr))
+            print("ERROR (while deleting the c++ source):", rm_result.stderr.decode("utf8"))
             return rm_result.returncode
 
     return 0
